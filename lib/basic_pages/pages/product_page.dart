@@ -112,17 +112,20 @@ class _ProductPageState extends State<ProductPage> {
                     itemCount: 10,
                     itemBuilder: (BuildContext cxt, int index) {
                       return ContainerCardAccepted(
-                        size: size,
-                        onPressedDelivered: () {
-                          //  Navigator.of(context).push(MaterialPageRoute(
-                          //     builder: (BuildContext context) => FinishPage()));
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      FinishedPage()));
-                        },
-                      );
+                          size: size,
+                          onPressedDelivered: () {
+                            //  Navigator.of(context).push(MaterialPageRoute(
+                            //     builder: (BuildContext context) => FinishPage()));
+                            WidgetsBinding.instance.addPostFrameCallback(
+                              (_) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            FinishedPage()));
+                              },
+                            );
+                          });
                     }),
               ),
             )

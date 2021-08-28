@@ -6,7 +6,7 @@ import 'package:supplier_project/service/my_behavior.dart';
 import 'dart:ui';
 
 import 'package:supplier_project/ui/widgets/text_field_container.dart';
-import 'package:supplier_project/widgets/button_material_container.dart';
+import 'package:supplier_project/ui/widgets/button_material_container.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key key}) : super(key: key);
