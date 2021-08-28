@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supplier_project/const/const_text.dart';
 import 'package:supplier_project/ui/widgets/bottom_navigation_button.dart';
-import 'package:supplier_project/ui/widgets/neck_background.dart';
+
 import 'package:supplier_project/ui/widgets/texts.dart';
 import 'package:supplier_project/ui/widgets/universal_button.dart';
 
@@ -27,6 +27,8 @@ class _FinishedPageState extends State<FinishedPage> {
   ];
   File _imageFile;
   var size;
+  double _currentSliderValue = 20;
+
   Future<void> captureImage(ImageSource imageSource) async {
     try {
       if (imageSource == ImageSource.camera) {
@@ -60,17 +62,23 @@ class _FinishedPageState extends State<FinishedPage> {
           listImage.add({'image_path': rotatedImage.path});
         }
       } else {
-        final ImagePicker _picker = ImagePicker();
-        final imageFile = await _picker.pickImage(
+        ImagePicker _picker = ImagePicker();
+        var imageFile = await _picker.pickImage(
           source: imageSource,
-          maxHeight: 1000,
-          maxWidth: 500,
-          imageQuality: 90,
+          maxHeight: 600,
+          // maxWidth: 500,
+
+          // imageQuality: 80,
 
           // preferredCameraDevice: CameraDevice.rear,
         );
 
-        final path = imageFile.path;
+        var path = imageFile.path;
+        // File sizeImageUpdate = new File(path);
+        // var decodedImage =
+        //     await decodeImageFromList(sizeImageUpdate.readAsBytesSync());
+        // print(decodedImage.width);
+        // print(decodedImage.height);
         // await ImageResize.saveImage(path);
         File rotatedImage =
             await FlutterExifRotation.rotateAndSaveImage(path: path);
@@ -88,23 +96,16 @@ class _FinishedPageState extends State<FinishedPage> {
     //     '/storage/emulated/0/Pictures/3c27f462-0fb4-485a-b847-5509d691c0805200698126285788651.jpg';
     if (index != 0) {
       return Container(
-        height: 100,
-        width: 100,
         child: Image.file(
           File(listImage[index]['image_path']),
         ),
       );
     } else {
-      return Icon(
-        Icons.add,
+      return ImageIcon(
+        AssetImage("assets/image/add_image.png"),
+        color: Colors.black,
         size: size.height * 0.08,
       );
-      //  Container(
-      //     height: 100,
-      //     width: 100,
-      //     child: Image.file(
-      //       File(a),
-      //     ));
     }
   }
 
@@ -112,59 +113,70 @@ class _FinishedPageState extends State<FinishedPage> {
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
+      appBar: AppBar(),
       bottomNavigationBar: BottomNavigationButton(
         size: size,
         onPressed: () {},
         text: 'Сақлаш',
       ),
-      body: Stack(
+      body: Column(
         children: [
-          NeckBackground(
-            size: size,
-            captureArea: 0.2,
-          ),
-          DraggableScrollableSheet(
-              initialChildSize: 0.9,
-              minChildSize: 0.9,
-              maxChildSize: 1.0,
-              builder: (context, scrolControoller) {
-                return NotificationListener(
-                  child: GridView.builder(
-                    itemCount: listImage.length,
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Container(
-                        margin: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          // color: ThemeOther.containerCar(),
-                          borderRadius: BorderRadius.circular(10),
-                          boxShadow: [
-                            new BoxShadow(
-                              // color: ThemeOther.containerShadowColor(),
-                              blurRadius: 5.0,
-                            ),
-                          ],
+          Container(
+            height: size.height * 0.15,
+            child: ListView.builder(
+              itemCount: listImage.length,
+              scrollDirection: Axis.horizontal,
+              itemBuilder: (BuildContext context, int index) {
+                return Container(
+                  margin: const EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                    color: Colors.blue[200],
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      new BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 5.0,
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () {
+                        index == 0
+                            ? _selectCamerOrGallery()
+                            : _selectImage(index);
+                      },
+                      child: new Container(
+                        width: size.width * 0.25,
+                        child: new GridTile(
+                          child: _buildImage(index),
                         ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(10),
-                            onTap: () {
-                              index == 0 ? _selectCamerOrGallery() : null;
-                            },
-                            child: new Container(
-                              child: new GridTile(
-                                child: _buildImage(index),
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
                 );
-              })
+              },
+            ),
+          ),
+          Divider(
+            height: 2,
+            color: Colors.black,
+          ),
+          Slider(
+            value: _currentSliderValue,
+            min: 0,
+            max: 100,
+            divisions: 5,
+            label: _currentSliderValue.round().toString(),
+            onChanged: (double value) {
+              setState(() {
+                _currentSliderValue = value;
+              });
+            },
+          ),
+          
         ],
       ),
     );
@@ -233,6 +245,26 @@ class _FinishedPageState extends State<FinishedPage> {
         captureImage(ImageSource.gallery);
         break;
     }
+  }
+
+  Future _selectImage(index) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // backgroundColor: ThemeOther.containerCar(),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            contentPadding: EdgeInsets.only(top: 10.0, bottom: 10),
+            content: Container(
+              width: size.width * 0.8,
+              height: size.height * 0.5,
+              child: Image.file(
+                File(listImage[index]['image_path']),
+              ),
+            ),
+          );
+        });
   }
 }
 
