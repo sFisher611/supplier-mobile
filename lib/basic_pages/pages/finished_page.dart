@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supplier_project/const/const_text.dart';
 import 'package:supplier_project/ui/widgets/bottom_navigation_button.dart';
+import 'package:supplier_project/ui/widgets/dropdown_be_border.dart';
+import 'package:supplier_project/ui/widgets/text_field_in_border_radius.dart';
 
 import 'package:supplier_project/ui/widgets/texts.dart';
 import 'package:supplier_project/ui/widgets/universal_button.dart';
@@ -28,14 +30,13 @@ class _FinishedPageState extends State<FinishedPage> {
   File _imageFile;
   var size;
   double _currentSliderValue = 20;
-
+  List<String> list = ['Boy', 'Orta', 'Nochor'];
+  var selectEvalution = 'Boy';
   Future<void> captureImage(ImageSource imageSource) async {
     try {
       if (imageSource == ImageSource.camera) {
         String filePath = await FileUtils.getDefaultFilePath();
         String uuid = DateTime.now().millisecondsSinceEpoch.toString();
-
-        ///
         filePath = '$filePath/$uuid.jpg';
         List<CameraDescription> cameraDescription = await availableCameras();
         DarwinCameraResult result = await Navigator.push(
@@ -52,11 +53,8 @@ class _FinishedPageState extends State<FinishedPage> {
         );
 
         if (result != null && result.isFileAvailable) {
-          /// File object returned by Camera.
-          print(result.file);
-
-          /// Path where the file is faced.
-          print(result.file.path);
+          // print(result.file);
+          // print(result.file.path);
           File rotatedImage = await FlutterExifRotation.rotateAndSaveImage(
               path: result.file.path);
           listImage.add({'image_path': rotatedImage.path});
@@ -66,20 +64,10 @@ class _FinishedPageState extends State<FinishedPage> {
         var imageFile = await _picker.pickImage(
           source: imageSource,
           maxHeight: 600,
-          // maxWidth: 500,
-
-          // imageQuality: 80,
-
           // preferredCameraDevice: CameraDevice.rear,
         );
 
         var path = imageFile.path;
-        // File sizeImageUpdate = new File(path);
-        // var decodedImage =
-        //     await decodeImageFromList(sizeImageUpdate.readAsBytesSync());
-        // print(decodedImage.width);
-        // print(decodedImage.height);
-        // await ImageResize.saveImage(path);
         File rotatedImage =
             await FlutterExifRotation.rotateAndSaveImage(path: path);
         _imageFile = rotatedImage;
@@ -164,6 +152,20 @@ class _FinishedPageState extends State<FinishedPage> {
             height: 2,
             color: Colors.black,
           ),
+          SizedBox(
+            height: 10,
+          ),
+          DropDownBeBorder(
+              size: size,
+              list: list,
+              icon: Icons.mail,
+              onChanged: (value) {
+                setState(() => selectEvalution = value);
+              },
+              selectedIndex: selectEvalution),
+          SizedBox(
+            height: 10,
+          ),
           Slider(
             value: _currentSliderValue,
             min: 0,
@@ -176,7 +178,9 @@ class _FinishedPageState extends State<FinishedPage> {
               });
             },
           ),
-          
+          TextFieldInBorderRadius(
+            hintText: "Изох",
+          )
         ],
       ),
     );
@@ -187,7 +191,6 @@ class _FinishedPageState extends State<FinishedPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            // backgroundColor: ThemeOther.containerCar(),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             contentPadding: EdgeInsets.only(top: 10.0),
@@ -196,7 +199,6 @@ class _FinishedPageState extends State<FinishedPage> {
               height: size.height * 0.2,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                // crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   UniversalButton(
@@ -252,7 +254,6 @@ class _FinishedPageState extends State<FinishedPage> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            // backgroundColor: ThemeOther.containerCar(),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(20.0))),
             contentPadding: EdgeInsets.only(top: 10.0, bottom: 10),
