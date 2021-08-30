@@ -4,4 +4,5 @@ class HttpConst {
   // ignore: non_constant_identifier_names
   static String additional = 'api/';
   static String regLogin = '${additional}users/registered';
+  static String login = '${additional}login';
 }

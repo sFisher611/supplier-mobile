@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
@@ -36,6 +38,7 @@ class _LoginPageState extends State<LoginPage>
   TextEditingController _name = new TextEditingController(text: '');
   bool regButtonEnable = true;
   bool loginButtonEnable = true;
+  int restartCode = 0;
   @override
   void initState() {
     _controller = AnimationController(
@@ -108,12 +111,61 @@ class _LoginPageState extends State<LoginPage>
       EasyLoading.dismiss();
       regButtonEnable = true;
       if (!res['error']) {
-        _loginSingUp.text = '';
-        _name.text = '';
-        _passwordSingUp.text = '';
+        setState(() {
+          _loginSingUp.text = '';
+          _name.text = '';
+          _passwordSingUp.text = '';
+          showSingUp = false;
+        });
         EasyLoading.showSuccess(res['data']['message']);
       } else {
-        EasyLoading.showInfo(res['message']);
+        EasyLoading.showInfo(res['message']['message']);
+      }
+    } else {
+      EasyLoading.showInfo(LOADER_EMPTY_DATA);
+      await restartKey();
+    }
+  }
+
+  restartKey() async {
+    if (restartCode == 10) {
+      // ignore: await_only_futures
+      await LocalMemory.removeData('key');
+      restartCode = 0;
+      EasyLoading.showSuccess('Clear key...');
+    } else {
+      restartCode++;
+    }
+  }
+
+  _jsonLogin() async {
+    if (_login.text.isNotEmpty && _password.text.isNotEmpty) {
+      loginButtonEnable = false;
+      EasyLoading.show(status: LOADER_LOADING);
+      String key = await LocalMemory.getData('key');
+      if (key == null) {
+        key = KeyFunction.getKey();
+        // ignore: await_only_futures
+        await LocalMemory.dataSave('key', key);
+      }
+      var data = {
+        'username': _login.text,
+        'password': _password.text,
+        'key': key
+      };
+      var res = await HttpJson.loginPasswordJson(HttpConst.login, data);
+      loginButtonEnable = true;
+      EasyLoading.dismiss();
+      if (!res['error']) {
+        var user = res['data'];
+        // ignore: await_only_futures
+        await LocalMemory.dataSave('user', jsonEncode(user));
+        Navigator.of(context).pushReplacement(
+            new MaterialPageRoute(builder: (BuildContext context) {
+          return BasicPage();
+        }));
+      } else {
+        EasyLoading.showInfo(res['message']['message']);
       }
     } else {
       EasyLoading.showInfo(LOADER_EMPTY_DATA);
@@ -218,10 +270,9 @@ class _LoginPageState extends State<LoginPage>
               title: "Кириш",
               width: 2.6,
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (BuildContext context) => BasicPage()));
+                if (loginButtonEnable) {
+                  _jsonLogin();
+                }
               },
             ),
             SizedBox(width: size.width / 25),

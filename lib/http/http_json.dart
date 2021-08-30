@@ -2,9 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:supplier_project/db/local_memory.dart';
 
-
 import 'http_const.dart';
-
 
 class HttpJson {
   static loginPasswordJson(url, data) async {
@@ -17,16 +15,16 @@ class HttpJson {
     };
 
     try {
-      var response =
-          await http.post(Uri.http(HttpConst.main_url, url), headers: header);
+      var response = await http.post(Uri.http(HttpConst.main_url, url),
+          body: jsonEncode(data), headers: header);
 
       if (response.statusCode == 200) {
         LocalMemory.dataSave('token', basicAuth);
-        var row = jsonDecode(response.body);
-        row['error'] = false;
+        var row = {'error': false, 'data': jsonDecode(response.body)};
+
         return row;
       } else {
-        var row = {'error': true, 'message': "Логин ёки парол хато"};
+        var row = {'error': true, 'message': jsonDecode(response.body)};
         return row;
       }
     } catch (e) {
@@ -35,7 +33,7 @@ class HttpJson {
     }
   }
 
-  static getJson( url) async {
+  static getJson(url) async {
     var head = await setHeaders();
     try {
       var res =
@@ -53,7 +51,8 @@ class HttpJson {
       return row;
     }
   }
-   static getJsonMessage( url) async {
+
+  static getJsonMessage(url) async {
     var head = await setHeaders();
     try {
       var res =
@@ -72,7 +71,7 @@ class HttpJson {
     }
   }
 
-  static postJson( url, data) async {
+  static postJson(url, data) async {
     var head = await setHeaders();
     try {
       var res = await http.post(Uri.http(HttpConst.main_url, url),
@@ -82,7 +81,7 @@ class HttpJson {
 
         return row;
       } else {
-        var row = {'error': true, 'message': "Сервер билан алоқа йўқ!"};
+        var row = {'error': true, 'message': jsonDecode(res.body)};
         return row;
       }
     } catch (e) {

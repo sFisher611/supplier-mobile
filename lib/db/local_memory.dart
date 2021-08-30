@@ -1,5 +1,3 @@
-
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalMemory {
@@ -12,5 +10,10 @@ class LocalMemory {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var text = prefs.getString(name);
     return text;
+  }
+
+  static void removeData(name) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('$name');
   }
 }
