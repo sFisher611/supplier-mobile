@@ -10,7 +10,7 @@ import 'package:supplier_project/const/const_text.dart';
 import 'package:supplier_project/ui/widgets/bottom_navigation_button.dart';
 import 'package:supplier_project/ui/widgets/dropdown_be_border.dart';
 import 'package:supplier_project/ui/widgets/text_field_in_border_radius.dart';
-
+import 'package:location/location.dart';
 import 'package:supplier_project/ui/widgets/texts.dart';
 import 'package:supplier_project/ui/widgets/universal_button.dart';
 
@@ -32,6 +32,39 @@ class _FinishedPageState extends State<FinishedPage> {
   double _currentSliderValue = 20;
   List<String> list = ['Boy', 'Orta', 'Nochor'];
   var selectEvalution = 'Boy';
+  var location = new Location();
+  var currentLocation;
+  @override
+  void initState() {
+    super.initState();
+    _location();
+  }
+
+  _location() async {
+    try {
+      var value = await location.getLocation();
+      setState(() {
+        currentLocation = {
+          'latitude': value.latitude,
+          'longitude': value.longitude
+        };
+      });
+    } catch (e) {
+      currentLocation = null;
+    }
+    setState(() {});
+    // location.onLocationChanged.listen((value) {
+    //   print(value);
+
+    //   setState(() {
+    //     currentLocation = {
+    //       'latitude': value.latitude,
+    //       'longitude': value.longitude
+    //     };
+    //   });
+    // });
+  }
+
   Future<void> captureImage(ImageSource imageSource) async {
     try {
       if (imageSource == ImageSource.camera) {
@@ -107,81 +140,99 @@ class _FinishedPageState extends State<FinishedPage> {
         onPressed: () {},
         text: 'Сақлаш',
       ),
-      body: Column(
-        children: [
-          Container(
-            height: size.height * 0.15,
-            child: ListView.builder(
-              itemCount: listImage.length,
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (BuildContext context, int index) {
-                return Container(
-                  margin: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    color: Colors.blue[200],
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      new BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 5.0,
-                      ),
-                    ],
-                  ),
-                  child: Material(
-                    color: Colors.transparent,
-                    child: InkWell(
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: size.height * 0.15,
+              child: ListView.builder(
+                itemCount: listImage.length,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index) {
+                  return Container(
+                    margin: const EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[200],
                       borderRadius: BorderRadius.circular(10),
-                      onTap: () {
-                        index == 0
-                            ? _selectCamerOrGallery()
-                            : _selectImage(index);
-                      },
-                      child: new Container(
-                        width: size.width * 0.25,
-                        child: new GridTile(
-                          child: _buildImage(index),
+                      boxShadow: [
+                        new BoxShadow(
+                          color: Colors.grey,
+                          blurRadius: 5.0,
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(10),
+                        onTap: () {
+                          index == 0
+                              ? _selectCamerOrGallery()
+                              : _selectImage(index);
+                        },
+                        child: new Container(
+                          width: size.width * 0.25,
+                          child: new GridTile(
+                            child: _buildImage(index),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
+                  );
+                },
+              ),
+            ),
+            Divider(
+              height: 2,
+              color: Colors.black,
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            DropDownBeBorder(
+                size: size,
+                list: list,
+                icon: Icons.mail,
+                onChanged: (value) {
+                  setState(() => selectEvalution = value);
+                },
+                selectedIndex: selectEvalution),
+            SizedBox(
+              height: 10,
+            ),
+            Slider(
+              value: _currentSliderValue,
+              min: 0,
+              max: 100,
+              divisions: 5,
+              label: _currentSliderValue.round().toString(),
+              onChanged: (double value) {
+                setState(() {
+                  _currentSliderValue = value;
+                });
               },
             ),
-          ),
-          Divider(
-            height: 2,
-            color: Colors.black,
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          DropDownBeBorder(
-              size: size,
-              list: list,
-              icon: Icons.mail,
-              onChanged: (value) {
-                setState(() => selectEvalution = value);
-              },
-              selectedIndex: selectEvalution),
-          SizedBox(
-            height: 10,
-          ),
-          Slider(
-            value: _currentSliderValue,
-            min: 0,
-            max: 100,
-            divisions: 5,
-            label: _currentSliderValue.round().toString(),
-            onChanged: (double value) {
-              setState(() {
-                _currentSliderValue = value;
-              });
-            },
-          ),
-          TextFieldInBorderRadius(
-            hintText: "Изох",
-          )
-        ],
+            TextFieldInBorderRadius(
+              hintText: "Изох",
+            ),
+            currentLocation == null
+                ? CircularProgressIndicator()
+                : Column(
+                    children: [
+                      ListTile(
+                        tileColor: Colors.blue[100],
+                        title: Text('latitude'),
+                        trailing: Text(currentLocation["latitude"].toString()),
+                      ),
+                      ListTile(
+                        tileColor: Colors.blue[100],
+                        title: Text('longitude'),
+                        trailing: Text(currentLocation["longitude"].toString()),
+                      ),
+                    ],
+                  ),
+          ],
+        ),
       ),
     );
   }
