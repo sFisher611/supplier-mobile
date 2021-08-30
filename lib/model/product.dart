@@ -32,7 +32,7 @@ class Product {
   String status;
   int branchId;
   int userId;
-  DateTime deliveryTime;
+  String deliveryTime;
   String customer;
   int productId;
   int orderId;
@@ -50,7 +50,7 @@ class Product {
         status: json["status"],
         branchId: json["branch_id"],
         userId: json["user_id"],
-        deliveryTime: DateTime.parse(json["delivery_time"]),
+        deliveryTime: json["delivery_time"],
         customer: json["customer"],
         productId: json["product_id"],
         orderId: json["order_id"],
@@ -69,7 +69,7 @@ class Product {
         "status": status,
         "branch_id": branchId,
         "user_id": userId,
-        "delivery_time": deliveryTime.toIso8601String(),
+        "delivery_time": deliveryTime,
         "customer": customer,
         "product_id": productId,
         "order_id": orderId,

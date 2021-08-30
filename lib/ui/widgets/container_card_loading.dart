@@ -149,7 +149,7 @@ class ContainerCardLoading extends StatelessWidget {
                           child: Text(
                             product.addres,
                             style: TextStyle(fontSize: 15),
-                            textAlign: TextAlign.center,
+                            textAlign: TextAlign.start,
                           ),
                         )
                       ],
