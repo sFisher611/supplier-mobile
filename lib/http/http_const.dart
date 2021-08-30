@@ -5,4 +5,6 @@ class HttpConst {
   static String additional = 'api/';
   static String regLogin = '${additional}users/registered';
   static String login = '${additional}login';
+
+  static String getProduct = '${additional}work/status';
 }

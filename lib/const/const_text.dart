@@ -29,3 +29,5 @@ String TEXT_BUTTON_DIALOG_GALLERY = 'Галерея';
 String LOADER_LOADING = 'Юкланмоқда...';
 // ignore: non_constant_identifier_names
 String LOADER_EMPTY_DATA = 'Маълумотлар етарли эмас!';
+// ignore: non_constant_identifier_names
+String LOADER_EMPTY_LIST = 'Маълумотлар мавжуд эмас!';
