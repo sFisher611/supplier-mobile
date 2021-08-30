@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:supplier_project/basic_pages/basic_page.dart';
+import 'package:supplier_project/const/const_text.dart';
+import 'package:supplier_project/db/local_memory.dart';
+import 'package:supplier_project/function/key_function.dart';
+import 'package:supplier_project/http/http_const.dart';
+import 'package:supplier_project/http/http_json.dart';
 import 'package:supplier_project/service/my_behavior.dart';
 import 'dart:ui';
 
@@ -28,7 +34,8 @@ class _LoginPageState extends State<LoginPage>
   TextEditingController _password = new TextEditingController(text: '');
   TextEditingController _passwordSingUp = new TextEditingController(text: '');
   TextEditingController _name = new TextEditingController(text: '');
-
+  bool regButtonEnable = true;
+  bool loginButtonEnable = true;
   @override
   void initState() {
     _controller = AnimationController(
@@ -77,6 +84,40 @@ class _LoginPageState extends State<LoginPage>
       visibilityPassword = true;
     }
     setState(() {});
+  }
+
+  _jsonRegistration() async {
+    if (_loginSingUp.text.isNotEmpty &&
+        _name.text.isNotEmpty &&
+        _passwordSingUp.text.isNotEmpty) {
+      regButtonEnable = false;
+      EasyLoading.show(status: LOADER_LOADING);
+      var key = await LocalMemory.getData('key');
+      print(key);
+      key = key == null ? KeyFunction.getKey() : key;
+      // ignore: await_only_futures
+      await LocalMemory.dataSave('key', key);
+      var data = {
+        "username": _loginSingUp.text,
+        "password": _passwordSingUp.text,
+        "name": _name.text,
+        "key": key
+      };
+
+      var res = await HttpJson.postJson(HttpConst.regLogin, data);
+      EasyLoading.dismiss();
+      regButtonEnable = true;
+      if (!res['error']) {
+        _loginSingUp.text = '';
+        _name.text = '';
+        _passwordSingUp.text = '';
+        EasyLoading.showSuccess(res['data']['message']);
+      } else {
+        EasyLoading.showInfo(res['message']);
+      }
+    } else {
+      EasyLoading.showInfo(LOADER_EMPTY_DATA);
+    }
   }
 
   @override
@@ -260,11 +301,20 @@ class _LoginPageState extends State<LoginPage>
               size: size,
               title: "Рўйхатдан ўтиш",
               width: 2.4,
-              onPressed: () {},
+              onPressed: () {
+                FocusScope.of(context).requestFocus(new FocusNode());
+                if (regButtonEnable) {
+                  _jsonRegistration();
+                }
+              },
             ),
             SizedBox(width: size.width / 25),
             InkWell(
-              onTap: _showSingUp,
+              onTap: () {
+                if (regButtonEnable) {
+                  _showSingUp();
+                }
+              },
               child: Container(
                 width: size.width / 2.6,
                 alignment: Alignment.center,

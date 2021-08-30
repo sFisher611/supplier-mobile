@@ -24,3 +24,8 @@ final String TEXT_RETURN_CARD_BUTTON = 'Қайтарилди';
 String TEXT_BUTTON_DIALOG_CAMERA = 'Камера';
 // ignore: non_constant_identifier_names
 String TEXT_BUTTON_DIALOG_GALLERY = 'Галерея';
+
+// ignore: non_constant_identifier_names
+String LOADER_LOADING = 'Юкланмоқда...';
+// ignore: non_constant_identifier_names
+String LOADER_EMPTY_DATA = 'Маълумотлар етарли эмас!';

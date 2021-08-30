@@ -6,7 +6,7 @@ import 'package:supplier_project/db/local_memory.dart';
 import 'http_const.dart';
 
 
-class HttpsJson {
+class HttpJson {
   static loginPasswordJson(url, data) async {
     String basicAuth = 'Basic ' +
         base64Encode(utf8.encode('${data['username']}:${data['password']}'));
