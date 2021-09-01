@@ -41,13 +41,24 @@ class _ProductPageState extends State<ProductPage> {
       for (var item in res['data']['data']) {
         product.add(Product.fromJson(item));
       }
-      if (product.length == 0) {
-        EasyLoading.showInfo(LOADER_EMPTY_LIST);
-      }
+      // if (product.length == 0) {
+      // EasyLoading.showInfo(LOADER_EMPTY_LIST);
+      // }
     } else {
       EasyLoading.showInfo(res['message']['messge']);
     }
     return product;
+  }
+
+  _jsonSetProduct(id, status) async {
+    var data = {'id': id, 'status': status};
+    var res = await HttpJson.postJson(HttpConst.productStatusUpdate, data);
+    if (!res['error']) {
+      EasyLoading.showSuccess(res['data']['message']);
+      setState(() {});
+    } else {
+      EasyLoading.showInfo(res['message']['message']);
+    }
   }
 
   @override
@@ -113,8 +124,11 @@ class _ProductPageState extends State<ProductPage> {
                               product: snapshot.data[index],
                               size: size,
                               onPressedAccepted: () {
-                                // Navigator.of(context).push(MaterialPageRoute(
-                                //     builder: (BuildContext context) => FinishPage()));
+                                _jsonSetProduct(
+                                    snapshot.data[index].id, STATUS_ACCEPTED);
+                              },
+                              onPressedCancel: () {
+                                _jsonSetProduct(snapshot.data[index].id, '');
                               },
                             );
                           });
@@ -143,18 +157,23 @@ class _ProductPageState extends State<ProductPage> {
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext cxt, int index) {
                             return ContainerCardAccepted(
-                                size: size,
-                                onPressedDelivered: () {
-                                  WidgetsBinding.instance.addPostFrameCallback(
-                                    (_) {
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (BuildContext context) =>
-                                                  FinishedPage()));
-                                    },
-                                  );
-                                });
+                              size: size,
+                              onPressedDelivered: () {
+                                WidgetsBinding.instance.addPostFrameCallback(
+                                  (_) {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (BuildContext context) =>
+                                                FinishedPage()));
+                                  },
+                                );
+                              },
+                              onPressedCancel: () {
+                                _jsonSetProduct(
+                                    snapshot.data[index].id, STATUS_ORDER);
+                              },
+                            );
                           });
                       break;
                     default:

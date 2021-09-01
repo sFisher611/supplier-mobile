@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:supplier_project/const/const_status.dart';
 import 'package:supplier_project/const/const_text.dart';
+import 'package:supplier_project/http/http_const.dart';
+import 'package:supplier_project/http/http_json.dart';
+import 'package:supplier_project/model/product.dart';
 import 'package:supplier_project/ui/widgets/container_card_return.dart';
 
 class ReturnProductPage extends StatefulWidget {
@@ -9,6 +14,34 @@ class ReturnProductPage extends StatefulWidget {
 }
 
 class _ReturnProductPageState extends State<ReturnProductPage> {
+  Future<void> _getProduct(status) async {
+    var data = {'status': status};
+    var res = await HttpJson.postJson(HttpConst.getProduct, data);
+    List<Product> product = [];
+    if (!res['error']) {
+      for (var item in res['data']['data']) {
+        product.add(Product.fromJson(item));
+      }
+      // if (product.length == 0) {
+      // EasyLoading.showInfo(LOADER_EMPTY_LIST);
+      // }
+    } else {
+      EasyLoading.showInfo(res['message']['messge']);
+    }
+    return product;
+  }
+
+  _jsonSetProduct(id, status) async {
+    var data = {'id': id, 'status': status};
+    var res = await HttpJson.postJson(HttpConst.productStatusUpdate, data);
+    if (!res['error']) {
+      EasyLoading.showSuccess(res['data']['message']);
+      setState(() {});
+    } else {
+      EasyLoading.showInfo(res['message']['message']);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -17,32 +50,51 @@ class _ReturnProductPageState extends State<ReturnProductPage> {
         title: Text(
           TEXT_RETURN_TITLE,
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.refresh,
-            ),
-            onPressed: () {},
-          )
-        ],
+        // actions: <Widget>[
+        //   IconButton(
+        //     icon: Icon(
+        //       Icons.refresh,
+        //     ),
+        //     onPressed: () {},
+        //   )
+        // ],
       ),
       body: LiquidPullToRefresh(
 //        key: _refreshIndicatorKey,	// key if you want to add
         onRefresh: () async {
-          return await Future.delayed(Duration(seconds: 3));
+          setState(() {});
+          // return await Future.delayed(Duration(seconds: 3));
         },
         springAnimationDurationInMilliseconds: 100,
         showChildOpacityTransition: true,
-        child: Container(
-          child: ListView.builder(
-              itemCount: 10,
-              itemBuilder: (BuildContext cxt, int index) {
-                return ContainerCardReturn(
-                  size: size,
-                  product: null,
-                  onPressedButton: (){},
+        child: FutureBuilder(
+          future: _getProduct(STATUS_RETURN_ORDER),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Center(child: CircularProgressIndicator());
+                break;
+              case ConnectionState.done:
+                return ListView.builder(
+                    itemCount: snapshot.data.length,
+                    itemBuilder: (BuildContext cxt, int index) {
+                      return ContainerCardReturn(
+                        size: size,
+                        product: null,
+                        onPressedButton: () {},
+                      );
+                    });
+                break;
+              default:
+                print('55');
+                return Center(
+                  child: Text('Pizdesss'),
                 );
-              }),
+            }
+            // if (snapshot.data == null) {
+
+            // }
+          },
         ),
       ),
     );

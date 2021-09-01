@@ -7,4 +7,5 @@ class HttpConst {
   static String login = '${additional}login';
 
   static String getProduct = '${additional}work/status';
+  static String productStatusUpdate = '${additional}work/status/update';
 }
