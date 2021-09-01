@@ -63,7 +63,16 @@ class _LoginPageState extends State<LoginPage>
     );
 
     _controller.forward();
+    _loadingLogin();
     super.initState();
+  }
+
+  _loadingLogin() async {
+    var user = await LocalMemory.getData('user');
+    if (user != null) {
+      _login.text = jsonDecode(user)['username'];
+      // setState(() {});
+    }
   }
 
   void _showSingUp() {
