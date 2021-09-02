@@ -33,7 +33,7 @@ class _ProductPageState extends State<ProductPage> {
     // _getProduct();
   }
 
-  Future<void> _getProduct(status) async {
+  Future<List<Product>> _getProduct(status) async {
     var data = {'status': status};
     var res = await HttpJson.postJson(HttpConst.getProduct, data);
     List<Product> product = [];
@@ -165,7 +165,10 @@ class _ProductPageState extends State<ProductPage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (BuildContext context) =>
-                                                FinishedPage()));
+                                                FinishedPage(
+                                                  product:
+                                                      snapshot.data[index],
+                                                )));
                                   },
                                 );
                               },

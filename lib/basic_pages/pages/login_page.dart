@@ -164,6 +164,12 @@ class _LoginPageState extends State<LoginPage>
       };
       var res = await HttpJson.loginPasswordJson(HttpConst.login, data);
       loginButtonEnable = true;
+      var res1 = await HttpJson.getJsonMessage(HttpConst.evalution);
+      if (!res1['error']) {
+        var da = res1['data']['data'];
+        // ignore: await_only_futures
+        await LocalMemory.dataSave('evalution', jsonEncode(da));
+      }
       EasyLoading.dismiss();
       if (!res['error']) {
         var user = res['data'];

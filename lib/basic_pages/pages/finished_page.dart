@@ -1,12 +1,20 @@
-import 'package:darwin_camera/darwin_camera.dart';
+import 'dart:convert';
 
+import 'package:darwin_camera/darwin_camera.dart';
+import 'dart:io' as Io;
+import 'dart:io' as Io;
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'dart:async';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:supplier_project/const/const.dart';
 import 'package:supplier_project/const/const_text.dart';
+import 'package:supplier_project/db/local_memory.dart';
+import 'package:supplier_project/http/http_const.dart';
+import 'package:supplier_project/http/http_json.dart';
 import 'package:supplier_project/ui/widgets/bottom_navigation_button.dart';
 import 'package:supplier_project/ui/widgets/dropdown_be_border.dart';
 import 'package:supplier_project/ui/widgets/text_field_in_border_radius.dart';
@@ -14,11 +22,10 @@ import 'package:location/location.dart';
 import 'package:supplier_project/ui/widgets/texts.dart';
 import 'package:supplier_project/ui/widgets/universal_button.dart';
 
+// ignore: must_be_immutable
 class FinishedPage extends StatefulWidget {
-  FinishedPage({
-    Key key,
-  }) : super(key: key);
-
+  FinishedPage({Key key, @required this.product}) : super(key: key);
+  var product;
   @override
   _FinishedPageState createState() => _FinishedPageState();
 }
@@ -29,15 +36,33 @@ class _FinishedPageState extends State<FinishedPage> {
   ];
   File _imageFile;
   var size;
-  double _currentSliderValue = 20;
+  double _currentSliderValue = 1;
   List<String> list = ['Boy', 'Orta', 'Nochor'];
-  var selectEvalution = 'Boy';
+  var selectEvalution = 0;
   var location = new Location();
   var currentLocation;
+  List<String> evalutionList = [];
+  TextEditingController _comment = new TextEditingController(text: '');
+  var ev;
   @override
   void initState() {
     super.initState();
     _location();
+    _loadingEvalution();
+  }
+
+  _loadingEvalution() async {
+    var listRow = jsonDecode(await LocalMemory.getData('evalution'));
+    ev = listRow;
+    for (var item in listRow) {
+      evalutionList.add(item['title']);
+    }
+
+    if (evalutionList.length == 0) {
+      EasyLoading.showInfo(LOADER_EMPTY_DATA);
+      Navigator.pop(context);
+    }
+    setState(() {});
   }
 
   _location() async {
@@ -130,11 +155,58 @@ class _FinishedPageState extends State<FinishedPage> {
     }
   }
 
+  finishedJson() async {
+    if (currentLocation != null && listImage.length > 1) {
+      var data = {
+        'token': TOKEN_OTHER_URL,
+        'suppiler': 'id',
+        'work': widget.product.id,
+        'price': 0,
+        'delivery': 'date',
+        'branch': widget.product.branch,
+        'user': null
+      };
+      var res = await HttpJson.postJsonOther(HttpConst.finisher_other, data);
+      if (!res['error']) {
+        if (res['data']['success']) {
+          await jsonSendImage();
+        }
+      } else {
+        EasyLoading.showInfo(res['message']);
+      }
+    }
+  }
+
+  jsonSendImage() async {
+    var data = {
+      'map_lat': currentLocation["latitude"].toString(),
+      'map_lon': currentLocation["longitude"].toString(),
+      'id': widget.product.id,
+      'evaliation_id': ev[selectEvalution]['id'],
+      'comment': _comment.text,
+      'images': getImagesBase64()
+    };
+    // var res  = await HttpJson.postJson(url, data)
+  }
+
+  getImagesBase64() {
+    var imag = [];
+    for (var item in listImage) {
+      var bytes = Io.File(item['image_path']).readAsBytesSync();
+      String img64 = base64Encode(bytes);
+
+      imag.add({'image_url': img64});
+    }
+    return imag;
+  }
+
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text(widget.product.product),
+      ),
       bottomNavigationBar: BottomNavigationButton(
         size: size,
         onPressed: () {},
@@ -189,30 +261,42 @@ class _FinishedPageState extends State<FinishedPage> {
             SizedBox(
               height: 10,
             ),
-            DropDownBeBorder(
-                size: size,
-                list: list,
-                icon: Icons.mail,
-                onChanged: (value) {
-                  setState(() => selectEvalution = value);
-                },
-                selectedIndex: selectEvalution),
+            evalutionList.length != 0
+                ? DropDownBeBorder(
+                    size: size,
+                    list: evalutionList,
+                    icon: Icons.mail,
+                    onChanged: (value) {
+                      setState(() {
+                        selectEvalution = evalutionList.indexOf(value);
+                        _currentSliderValue = double.parse(
+                            evalutionList.indexOf(value).toString());
+                      });
+                    },
+                    selectedIndex: evalutionList[selectEvalution])
+                : Container(),
             SizedBox(
               height: 10,
             ),
-            Slider(
-              value: _currentSliderValue,
-              min: 0,
-              max: 100,
-              divisions: 5,
-              label: _currentSliderValue.round().toString(),
-              onChanged: (double value) {
-                setState(() {
-                  _currentSliderValue = value;
-                });
-              },
-            ),
+            evalutionList.length != 0
+                ? Slider(
+                    value: _currentSliderValue,
+                    min: 0,
+                    max: double.parse((evalutionList.length - 1).toString()),
+                    divisions: evalutionList.length - 1,
+                    label:
+                        evalutionList[_currentSliderValue.round()].toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        selectEvalution = _currentSliderValue.round();
+                        _currentSliderValue = value;
+                        // print(_currentSliderValue);
+                      });
+                    },
+                  )
+                : Container(),
             TextFieldInBorderRadius(
+              controller: _comment,
               hintText: "Изох",
             ),
             currentLocation == null
