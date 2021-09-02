@@ -1,5 +1,5 @@
 // ignore: non_constant_identifier_names
-final String TEXT_PRODUCT_DELIVERED = 'Йетказилиш керак товарлар';
+final String TEXT_PRODUCT_DELIVERED = 'Етказилиш керак товарлар';
 // ignore: non_constant_identifier_names
 final String TEXT_PRODUCT_LOADING = 'Юкланган';
 // ignore: non_constant_identifier_names

@@ -89,7 +89,21 @@ class HttpJson {
       return row;
     }
   }
+  static postJsonOther(url, data) async {
+    var head = await setHeaders();
+    try {
+      var res = await http.post(Uri.https(HttpConst.main_url_other, url),
+          headers: head, body: jsonEncode(data));
+     
+        var row = {'error': false, 'data': jsonDecode(res.body)};
 
+        return row;
+    
+    } catch (e) {
+      var row = {'error': true, 'message': "Сервер билан алоқа йўқ!"};
+      return row;
+    }
+  }
   static Future<Map<String, String>> setHeaders() async {
     var token = await LocalMemory.getData('token');
 
