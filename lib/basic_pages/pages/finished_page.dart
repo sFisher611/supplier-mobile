@@ -195,9 +195,7 @@ class _FinishedPageState extends State<FinishedPage> {
       };
       var res = await HttpJson.postJsonOther(HttpConst.finisher_other, data);
       if (!res['error']) {
-        if (res['data']['success']) {
-          await jsonSendImage();
-        }
+        if (res['data']['success']) {}
       } else {
         EasyLoading.showInfo(res['message']);
       }
@@ -231,16 +229,21 @@ class _FinishedPageState extends State<FinishedPage> {
   }
 
   jsonSendImage() async {
-    var data = await createDataSender();
-    // ignore: await_only_futures
-    await LocalMemory.dataSave('${widget.product.id}', jsonEncode(data));
-    var res = await HttpJson.postJson(HttpConst.finisherd_send_image, data);
-    if (!res['error']) {
-      EasyLoading.showSuccess(res['data']['message']);
+    if (currentLocation != null && listImage.length > 1) {
+      var data = await createDataSender();
       // ignore: await_only_futures
-      await LocalMemory.removeData('${widget.product.id}');
+      await LocalMemory.dataSave('${widget.product.id}', jsonEncode(data));
+      var res = await HttpJson.postJson(HttpConst.finisherd_send_image, data);
+      if (!res['error']) {
+        EasyLoading.showSuccess(res['data']['message']);
+        Navigator.pop(context, '1');
+        // ignore: await_only_futures
+        await LocalMemory.removeData('${widget.product.id}');
+      } else {
+        EasyLoading.showInfo(res['message']);
+      }
     } else {
-      EasyLoading.showInfo(res['message']);
+      EasyLoading.showInfo(LOADER_EMPTY_DATA);
     }
   }
 
@@ -266,7 +269,8 @@ class _FinishedPageState extends State<FinishedPage> {
       bottomNavigationBar: BottomNavigationButton(
         size: size,
         onPressed: () {
-          finishedJson();
+          jsonSendImage();
+          // finishedJson();
         },
         text: 'Сақлаш',
       ),

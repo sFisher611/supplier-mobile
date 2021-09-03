@@ -31,8 +31,8 @@ class _ReturnProductPageState extends State<ReturnProductPage> {
     return product;
   }
 
-  _jsonSetProduct(id, status) async {
-    var data = {'id': id, 'status': status};
+  _jsonSetProduct(id) async {
+    var data = {'id': id};
     var res = await HttpJson.postJson(HttpConst.productStatusUpdate, data);
     if (!res['error']) {
       EasyLoading.showSuccess(res['data']['message']);
@@ -42,32 +42,65 @@ class _ReturnProductPageState extends State<ReturnProductPage> {
     }
   }
 
+  showAlertDialog(BuildContext context, id) {
+    // set up the button
+    Widget okButton = TextButton(
+      child: Text("Ха"),
+      onPressed: () {
+        _jsonSetProduct(id);
+        Navigator.pop(context);
+      },
+    );
+    Widget cancelButton = TextButton(
+      child: Text("Йўқ"),
+      onPressed: () {
+        Navigator.pop(context);
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Тасдиқлаш"),
+      // content: Text("This is my message."),
+      actions: [
+        okButton,
+        cancelButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          TEXT_RETURN_TITLE,
-        ),
-        // actions: <Widget>[
-        //   IconButton(
-        //     icon: Icon(
-        //       Icons.refresh,
-        //     ),
-        //     onPressed: () {},
-        //   )
-        // ],
-      ),
-      body: LiquidPullToRefresh(
+    return LiquidPullToRefresh(
 //        key: _refreshIndicatorKey,	// key if you want to add
-        onRefresh: () async {
-          setState(() {});
-          // return await Future.delayed(Duration(seconds: 3));
-        },
-        springAnimationDurationInMilliseconds: 100,
-        showChildOpacityTransition: true,
-        child: FutureBuilder(
+      onRefresh: () async {
+        setState(() {});
+        // return await Future.delayed(Duration(seconds: 3));
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            TEXT_RETURN_TITLE,
+          ),
+          // actions: <Widget>[
+          //   IconButton(
+          //     icon: Icon(
+          //       Icons.refresh,
+          //     ),
+          //     onPressed: () {},
+          //   )
+          // ],
+        ),
+        body: FutureBuilder(
           future: _getProduct(STATUS_RETURN_ORDER),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             switch (snapshot.connectionState) {
@@ -81,14 +114,18 @@ class _ReturnProductPageState extends State<ReturnProductPage> {
                       return ContainerCardReturn(
                         size: size,
                         product: null,
-                        onPressedButton: () {},
+                        onPressedButton: () {
+                          showAlertDialog(context, snapshot.data[index].id);
+                        },
+                        onLongPressed: () {},
+                        onPressed: () {},
                       );
                     });
                 break;
               default:
                 print('55');
                 return Center(
-                  child: Text('Pizdesss'),
+                  child: Text('!!!'),
                 );
             }
             // if (snapshot.data == null) {

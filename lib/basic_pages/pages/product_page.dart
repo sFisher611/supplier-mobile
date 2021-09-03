@@ -166,9 +166,12 @@ class _ProductPageState extends State<ProductPage> {
                                         MaterialPageRoute(
                                             builder: (BuildContext context) =>
                                                 FinishedPage(
-                                                  product:
-                                                      snapshot.data[index],
-                                                )));
+                                                  product: snapshot.data[index],
+                                                ))).then((value) {
+                                      if (value == '1') {
+                                        setState(() {});
+                                      }
+                                    });
                                   },
                                 );
                               },

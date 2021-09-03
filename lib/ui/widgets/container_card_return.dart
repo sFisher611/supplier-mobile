@@ -8,6 +8,8 @@ class ContainerCardReturn extends StatelessWidget {
     this.size,
     this.product,
     this.onPressedButton,
+    this.onLongPressed,
+    this.onPressed,
   }) : super(key: key);
   final size;
   final product;
