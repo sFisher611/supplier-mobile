@@ -47,8 +47,33 @@ class _FinishedPageState extends State<FinishedPage> {
   @override
   void initState() {
     super.initState();
-    _location();
+    _checkDataOther();
+  }
+
+  _checkDataOther() async {
     _loadingEvalution();
+    var data = await LocalMemory.getData('${widget.product.id}');
+    if (data == null) {
+      _location();
+    } else {
+      data = jsonDecode(data);
+      currentLocation = {
+        'latitude': data['map_lat'],
+        'longitude': data['map_lon']
+      };
+      _comment.text = data['comment'];
+      for (var item in data['images']) {
+        if (data['images'].indexOf(item) != 0) {
+          listImage.add({'image_path': item['image_path']});
+        }
+      }
+      for (var item in ev) {
+        if (item['id'] == data['evaliation_id']) {
+          selectEvalution = ev.indexOf(item);
+        }
+      }
+      setState(() {});
+    }
   }
 
   _loadingEvalution() async {
@@ -116,6 +141,7 @@ class _FinishedPageState extends State<FinishedPage> {
           File rotatedImage = await FlutterExifRotation.rotateAndSaveImage(
               path: result.file.path);
           listImage.add({'image_path': rotatedImage.path});
+          createData();
         }
       } else {
         ImagePicker _picker = ImagePicker();
@@ -130,6 +156,7 @@ class _FinishedPageState extends State<FinishedPage> {
             await FlutterExifRotation.rotateAndSaveImage(path: path);
         _imageFile = rotatedImage;
         listImage.add({'image_path': _imageFile.path});
+        createData();
       }
       setState(() {});
     } catch (e) {
@@ -163,7 +190,7 @@ class _FinishedPageState extends State<FinishedPage> {
         'work': widget.product.id,
         'price': 0,
         'delivery': 'date',
-        'branch': widget.product.branch,
+        'branch': widget.product.branchId,
         'user': null
       };
       var res = await HttpJson.postJsonOther(HttpConst.finisher_other, data);
@@ -177,25 +204,54 @@ class _FinishedPageState extends State<FinishedPage> {
     }
   }
 
-  jsonSendImage() async {
+  createData() async {
     var data = {
       'map_lat': currentLocation["latitude"].toString(),
       'map_lon': currentLocation["longitude"].toString(),
       'id': widget.product.id,
       'evaliation_id': ev[selectEvalution]['id'],
       'comment': _comment.text,
-      'images': getImagesBase64()
+      'images': listImage
     };
-    // var res  = await HttpJson.postJson(url, data)
+    // ignore: await_only_futures
+    await LocalMemory.dataSave('${widget.product.id}', jsonEncode(data));
   }
 
-  getImagesBase64() {
-    var imag = [];
-    for (var item in listImage) {
-      var bytes = Io.File(item['image_path']).readAsBytesSync();
-      String img64 = base64Encode(bytes);
+  createDataSender() async {
+    var data = {
+      'map_lat': currentLocation["latitude"].toString(),
+      'map_lon': currentLocation["longitude"].toString(),
+      'id': widget.product.id,
+      'evaliation_id': ev[selectEvalution]['id'],
+      'comment': _comment.text,
+      'images': getImagesBase64(listImage)
+    };
+    // ignore: await_only_futures
+    return data;
+  }
 
-      imag.add({'image_url': img64});
+  jsonSendImage() async {
+    var data = await createDataSender();
+    // ignore: await_only_futures
+    await LocalMemory.dataSave('${widget.product.id}', jsonEncode(data));
+    var res = await HttpJson.postJson(HttpConst.finisherd_send_image, data);
+    if (!res['error']) {
+      EasyLoading.showSuccess(res['data']['message']);
+      // ignore: await_only_futures
+      await LocalMemory.removeData('${widget.product.id}');
+    } else {
+      EasyLoading.showInfo(res['message']);
+    }
+  }
+
+  getImagesBase64(list) {
+    var imag = [];
+    for (var item in list) {
+      if (0 != list.indexOf(item)) {
+        var bytes = Io.File(item['image_path']).readAsBytesSync();
+        String img64 = base64Encode(bytes);
+        imag.add({'image_url': img64});
+      }
     }
     return imag;
   }
@@ -209,7 +265,9 @@ class _FinishedPageState extends State<FinishedPage> {
       ),
       bottomNavigationBar: BottomNavigationButton(
         size: size,
-        onPressed: () {},
+        onPressed: () {
+          finishedJson();
+        },
         text: 'Сақлаш',
       ),
       body: SingleChildScrollView(

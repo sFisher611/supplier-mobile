@@ -92,7 +92,7 @@ class HttpJson {
   static postJsonOther(url, data) async {
     var head = await setHeaders();
     try {
-      var res = await http.post(Uri.https(HttpConst.main_url_other, url),
+      var res = await http.post(Uri.http(HttpConst.main_url_other, url),
           headers: head, body: jsonEncode(data));
      
         var row = {'error': false, 'data': jsonDecode(res.body)};

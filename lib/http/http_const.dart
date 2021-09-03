@@ -14,5 +14,8 @@ class HttpConst {
 
   static String getProduct = '${additional}work/status';
   static String productStatusUpdate = '${additional}work/status/update';
-  static String evalution = '${additional}valuation';
+  static String evalution = '${additional}evaluation';
+
+  // ignore: non_constant_identifier_names
+  static String finisherd_send_image = '${additional}work/finished';
 }
