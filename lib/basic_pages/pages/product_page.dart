@@ -61,6 +61,17 @@ class _ProductPageState extends State<ProductPage> {
     }
   }
 
+  _jsonSetProductStausNull(id) async {
+    var data = {'id': id};
+    var res = await HttpJson.postJson(HttpConst.productStatusUpdateNull, data);
+    if (!res['error']) {
+      EasyLoading.showSuccess(res['data']['message']);
+      setState(() {});
+    } else {
+      EasyLoading.showInfo(res['message']['message']);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     size = MediaQuery.of(context).size;
@@ -118,7 +129,7 @@ class _ProductPageState extends State<ProductPage> {
                     case ConnectionState.done:
                       return ListView.builder(
                           itemCount: snapshot.data.length,
-                          controller: _scrollController,
+                          // controller: _scrollController,
                           itemBuilder: (BuildContext cxt, int index) {
                             return ContainerCardLoading(
                               product: snapshot.data[index],
@@ -128,7 +139,8 @@ class _ProductPageState extends State<ProductPage> {
                                     snapshot.data[index].id, STATUS_ACCEPTED);
                               },
                               onPressedCancel: () {
-                                _jsonSetProduct(snapshot.data[index].id, '');
+                                _jsonSetProductStausNull(
+                                    snapshot.data[index].id);
                               },
                             );
                           });

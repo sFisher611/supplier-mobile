@@ -62,7 +62,7 @@ class ContainerCardFinished extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    'Кондиционер LG invertor',
+                                    product.product,
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 )
@@ -83,7 +83,7 @@ class ContainerCardFinished extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    'Очилов Сардор ',
+                                    product.customer,
                                     style: TextStyle(fontSize: 16),
                                   ),
                                 )
@@ -104,7 +104,7 @@ class ContainerCardFinished extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    '+998 91 123 45 67',
+                                    product.phone,
                                     style: TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
@@ -145,7 +145,7 @@ class ContainerCardFinished extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            'Данғара тумани, Ганжиравон МФЙ Наврўз кўчаси',
+                            product.addres,
                             style: TextStyle(fontSize: 15),
                             textAlign: TextAlign.start,
                           ),

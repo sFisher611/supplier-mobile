@@ -13,8 +13,10 @@ class HttpConst {
   static String login = '${additional}login';
 
   static String getProduct = '${additional}work/status';
+  static String getFinishedProducts = '${additional}work/info';
   static String productStatusUpdate = '${additional}work/status/update';
   static String productStatusUpdateReturn = '${additional}work/status_brought';
+  static String productStatusUpdateNull = '${additional}work/status_null';
   static String evalution = '${additional}evaluation';
 
   // ignore: non_constant_identifier_names
