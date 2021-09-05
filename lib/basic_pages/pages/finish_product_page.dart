@@ -73,8 +73,19 @@ class _FinishProductPageState extends State<FinishProductPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            TEXT_FINISHED_TITLE,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                TEXT_FINISHED_TITLE,
+              ),
+              Text(
+                _date1.toString().substring(0, 10) +
+                    ' дан ' +
+                    _date2.toString().substring(0, 10),
+                    style: TextStyle(fontSize: 12,color: Colors.grey[400]),
+              ),
+            ],
           ),
           actions: <Widget>[
             IconButton(

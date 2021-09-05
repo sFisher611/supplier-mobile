@@ -113,7 +113,7 @@ class _ReturnProductPageState extends State<ReturnProductPage> {
                     itemBuilder: (BuildContext cxt, int index) {
                       return ContainerCardReturn(
                         size: size,
-                        product: null,
+                        product: snapshot.data[index],
                         onPressedButton: () {
                           showAlertDialog(context, snapshot.data[index].id);
                         },

@@ -169,6 +169,7 @@ class _ProductPageState extends State<ProductPage> {
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext cxt, int index) {
                             return ContainerCardAccepted(
+                              product: snapshot.data[index],
                               size: size,
                               onPressedDelivered: () {
                                 WidgetsBinding.instance.addPostFrameCallback(
