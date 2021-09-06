@@ -6,6 +6,57 @@ class PersonalPage extends StatefulWidget {
 }
 
 class _PersonalPageState extends State<PersonalPage> {
+  var _date1;
+  var _date2;
+  @override
+  void initState() {
+    super.initState();
+    DateTime now = DateTime.now();
+    _date1 = DateTime(now.year, now.month - 1, now.day);
+    _date2 = DateTime(now.year, now.month, now.day);
+  }
+
+  dateTimeRangePicker() async {
+    DateTimeRange picked = await showDateRangePicker(
+      saveText: 'Сақлаш',
+      helpText: 'Вақт танлаш',
+      context: context,
+      //locale: const Locale('uzb', 'UZ'),
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime(DateTime.now().year + 5),
+      initialDateRange: DateTimeRange(
+        end: DateTime(
+            DateTime.now().year, DateTime.now().month, DateTime.now().day + 1),
+        start: DateTime.now(),
+      ),
+    );
+    if (picked != null) {
+      _date1 = picked.start;
+      _date2 = picked.end;
+      setState(() {});
+    }
+  }
+
+  Future _getProduct(status) async {
+    //   var data = {
+    //     'status': status,
+    //     'start': _date1.toString(),
+    //     'finish': _date2.toString()
+    //   };
+    //   var res = await HttpJson.postJson(HttpConst.getFinishedProducts, data);
+    //   List<Product> product = [];
+    //   if (!res['error']) {
+    //     for (var item in res['data']['data']) {
+    //       product.add(Product.fromJson(item));
+    //     }
+    //     // if (product.length == 0) {
+    //     // EasyLoading.showInfo(LOADER_EMPTY_LIST);
+    //     // }
+    //   } else {
+    //     EasyLoading.showInfo(res['message']);
+    //   }
+    // return product;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,22 +67,13 @@ class _PersonalPageState extends State<PersonalPage> {
         actions: <Widget>[
           IconButton(
             icon: Icon(
-              Icons.access_time,
-            ),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.refresh,
+              Icons.date_range,
             ),
             onPressed: () {},
           ),
           PopupMenuButton(
             itemBuilder: (BuildContext context) {
               return [
-                PopupMenuItem(
-                  child: Text('Созламалар'),
-                ),
                 PopupMenuItem(
                   child: Text('Созламалар'),
                 ),

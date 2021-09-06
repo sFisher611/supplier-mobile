@@ -18,6 +18,7 @@ class HttpConst {
   static String productStatusUpdateReturn = '${additional}work/status_brought';
   static String productStatusUpdateNull = '${additional}work/status_null';
   static String evalution = '${additional}evaluation';
+  static String personal = '${additional}work/amount_count';
 
   // ignore: non_constant_identifier_names
   static String finisherd_send_image = '${additional}work/finished';
