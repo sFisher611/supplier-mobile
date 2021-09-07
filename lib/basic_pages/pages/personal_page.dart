@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:supplier_project/http/http_const.dart';
+import 'package:supplier_project/http/http_json.dart';
 
 class PersonalPage extends StatefulWidget {
   @override
@@ -8,12 +11,14 @@ class PersonalPage extends StatefulWidget {
 class _PersonalPageState extends State<PersonalPage> {
   var _date1;
   var _date2;
+  var resObj;
   @override
   void initState() {
     super.initState();
     DateTime now = DateTime.now();
     _date1 = DateTime(now.year, now.month - 1, now.day);
     _date2 = DateTime(now.year, now.month, now.day);
+    _getPersonal();
   }
 
   dateTimeRangePicker() async {
@@ -33,30 +38,24 @@ class _PersonalPageState extends State<PersonalPage> {
     if (picked != null) {
       _date1 = picked.start;
       _date2 = picked.end;
+      _getPersonal();
       setState(() {});
     }
   }
 
-  Future _getProduct(status) async {
-    //   var data = {
-    //     'status': status,
-    //     'start': _date1.toString(),
-    //     'finish': _date2.toString()
-    //   };
-    //   var res = await HttpJson.postJson(HttpConst.getFinishedProducts, data);
-    //   List<Product> product = [];
-    //   if (!res['error']) {
-    //     for (var item in res['data']['data']) {
-    //       product.add(Product.fromJson(item));
-    //     }
-    //     // if (product.length == 0) {
-    //     // EasyLoading.showInfo(LOADER_EMPTY_LIST);
-    //     // }
-    //   } else {
-    //     EasyLoading.showInfo(res['message']);
-    //   }
-    // return product;
+  _getPersonal() async {
+    var data = {'start': _date1.toString(), 'finish': _date2.toString()};
+    var res = await HttpJson.postJson(HttpConst.personal, data);
+    var personal = [];
+    if (!res['error']) {
+      setState(() {
+        resObj = res['data']['data'];
+      });
+    } else {
+      EasyLoading.showInfo(res['message']);
+    }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,7 +68,9 @@ class _PersonalPageState extends State<PersonalPage> {
             icon: Icon(
               Icons.date_range,
             ),
-            onPressed: () {},
+            onPressed: () {
+              dateTimeRangePicker();
+            },
           ),
           PopupMenuButton(
             itemBuilder: (BuildContext context) {
@@ -93,32 +94,49 @@ class _PersonalPageState extends State<PersonalPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                child: Column(
-                  children: [
-                    Container(
-                      width: MediaQuery.of(context).size.width * 1,
-                      height: 20,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10.0),
-                            topRight: Radius.circular(10.0),
+                child: resObj == null
+                    ? Center(child: CircularProgressIndicator())
+                    : Column(
+                        children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width * 1,
+                            height: 20,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(10.0),
+                                  topRight: Radius.circular(10.0),
+                                ),
+                                color: Colors.grey[400]),
+                            child: Text(
+                              '   Статистика',
+                              style: TextStyle(fontSize: 18),
+                            ),
                           ),
-                          color: Colors.grey[400]),
-                      child: Text(
-                        '   Статистика',
-                        style: TextStyle(fontSize: 18),
+                          buildListAbut(
+                              Icons.people_alt,
+                              'Хизмат курсатилган мижозлар: ',
+                              (resObj['delivered'] + resObj['brought'])
+                                  .toString()),
+                          buildListAbut(
+                              Icons.people_alt,
+                              'Етказилмаган товарлар сони: ',
+                              resObj['accepted']
+                                  .toString()),
+                          buildListAbut(
+                              Icons.check_circle,
+                              'Етказилган товарлар сони: ',
+                              resObj['delivered'].toString()),
+                          buildListAbut(
+                              Icons.keyboard_return,
+                              'Қайтарилган товарлар сони: ',
+                              resObj['brought'].toString()),
+                          buildListAbut(
+                              Icons.monetization_on,
+                              'Хизматлар сони: ',
+                              (resObj['delivered'] + resObj['brought'])
+                                  .toString()),
+                        ],
                       ),
-                    ),
-                    buildListAbut(Icons.people_alt,
-                        'Хизмат курсатилган мижозлар: ', '25'),
-                    buildListAbut(
-                        Icons.check_circle, 'Етказилган товарлар сони: ', '25'),
-                    buildListAbut(Icons.keyboard_return,
-                        'Қайтарилган товарлар сони: ', '25'),
-                    buildListAbut(
-                        Icons.monetization_on, 'Хизматлар сони: ', '25'),
-                  ],
-                ),
               ),
             ),
           ),
