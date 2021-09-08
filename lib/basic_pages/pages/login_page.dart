@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:supplier_project/basic_pages/basic_page.dart';
+import 'package:supplier_project/basic_pages/pages/update_page.dart';
+import 'package:supplier_project/const/const.dart';
 import 'package:supplier_project/const/const_text.dart';
 import 'package:supplier_project/db/local_memory.dart';
 import 'package:supplier_project/function/key_function.dart';
@@ -170,17 +172,32 @@ class _LoginPageState extends State<LoginPage>
         // ignore: await_only_futures
         await LocalMemory.dataSave('evalution', jsonEncode(da));
       }
+      var res_version = await HttpJson.getJson(HttpConst.version);
       EasyLoading.dismiss();
-      if (!res['error']) {
-        var user = res['data'];
-        // ignore: await_only_futures
-        await LocalMemory.dataSave('user', jsonEncode(user));
-        Navigator.of(context).pushReplacement(
-            new MaterialPageRoute(builder: (BuildContext context) {
-          return BasicPage();
-        }));
+      if (!res_version['error']) {
+        if (res_version['data']['version'] != VERSION) {
+          Navigator.of(context).pushReplacement(
+              new MaterialPageRoute(builder: (BuildContext context) {
+            return UpdatePage(
+              object: res_version['data'],
+            );
+          }));
+        } else {
+          if (!res['error']) {
+            var user = res['data'];
+            // ignore: await_only_futures
+            await LocalMemory.dataSave('user', jsonEncode(user));
+
+            Navigator.of(context).pushReplacement(
+                new MaterialPageRoute(builder: (BuildContext context) {
+              return BasicPage();
+            }));
+          } else {
+            EasyLoading.showInfo(res['message']['message']);
+          }
+        }
       } else {
-        EasyLoading.showInfo(res['message']['message']);
+        EasyLoading.showInfo(res_version['message']);
       }
     } else {
       EasyLoading.showInfo(LOADER_EMPTY_DATA);

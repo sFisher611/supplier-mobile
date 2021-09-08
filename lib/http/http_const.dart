@@ -22,4 +22,5 @@ class HttpConst {
 
   // ignore: non_constant_identifier_names
   static String finisherd_send_image = '${additional}work/finished';
+  static String version = '${additional}version_last';
 }
