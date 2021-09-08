@@ -36,6 +36,7 @@ dependencies:
   path_provider: ^2.0.2
   shared_preferences: ^2.0.7
   ota_update: ^3.0.2
+  permission_handler: ^8.1.4+2
 
 dev_dependencies:
   flutter_test:

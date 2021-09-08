@@ -5,6 +5,7 @@ import 'package:supplier_project/basic_pages/pages/product_page.dart';
 import 'package:supplier_project/basic_pages/pages/finish_product_page.dart';
 import 'package:supplier_project/basic_pages/pages/personal_page.dart';
 import 'package:supplier_project/basic_pages/pages/return_product_page.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BasicPage extends StatefulWidget {
   @override
@@ -20,6 +21,13 @@ class _BasicPageState extends State<BasicPage> {
     FinishProductPage(),
     PersonalPage()
   ];
+  @override
+  void initState() {
+    super.initState();
+
+    cameraPermission();
+  }
+
   Future<bool> onWillPop() {
     DateTime now = DateTime.now();
     if (currentBackPressTime == null ||
@@ -33,6 +41,51 @@ class _BasicPageState extends State<BasicPage> {
     }
 
     return Future.value(true);
+  }
+
+  void cameraPermission() async {
+    // ignore: unrelated_type_equality_checks
+    if (Permission.camera != PermissionStatus.granted) {
+      await Permission.camera.request().then((value) {
+        micrafonPermission();
+      });
+    } else {
+      micrafonPermission();
+    }
+  }
+
+  void micrafonPermission() async {
+    // ignore: unrelated_type_equality_checks
+    if (Permission.microphone != PermissionStatus.granted) {
+      await Permission.microphone.request().then((value) {
+        mPermission();
+      });
+    } else {
+      mPermission();
+    }
+  }
+
+  void mPermission() async {
+    // ignore: unrelated_type_equality_checks
+    if (Permission.location != PermissionStatus.granted) {
+      await Permission.location.request().then((value) {
+        sPermission();
+      });
+    } else {
+      sPermission();
+    }
+  }
+
+  void sPermission() async {
+    // ignore: unrelated_type_equality_checks
+    if (Permission.storage != PermissionStatus.granted) {
+      Permission.storage.request().then((value) {
+        // ignore: unrelated_type_equality_checks
+        if (Permission.mediaLibrary != PermissionStatus.granted) {
+          Permission.mediaLibrary.request().then((value) {});
+        }
+      });
+    }
   }
 
   @override

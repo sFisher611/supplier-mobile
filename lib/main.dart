@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'basic_pages/pages/login_page.dart';
 import 'service/custom_animation.dart';
@@ -44,7 +45,10 @@ class _HomePageState extends State<HomePage> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+ 
   }
+
+ 
 
   @override
   Widget build(BuildContext context) {
