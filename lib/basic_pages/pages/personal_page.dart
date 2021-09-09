@@ -60,8 +60,18 @@ class _PersonalPageState extends State<PersonalPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Шахсий профил',
+        title: Column(
+          children: [
+            Text(
+              'Шахсий профил',
+            ),
+            Text(
+              _date1.toString().substring(0, 10) +
+                  ' дан ' +
+                  _date2.toString().substring(0, 10),
+              style: TextStyle(fontSize: 12, color: Colors.grey[400]),
+            ),
+          ],
         ),
         actions: <Widget>[
           IconButton(
@@ -120,8 +130,7 @@ class _PersonalPageState extends State<PersonalPage> {
                           buildListAbut(
                               Icons.people_alt,
                               'Етказилмаган товарлар сони: ',
-                              resObj['accepted']
-                                  .toString()),
+                              resObj['accepted'].toString()),
                           buildListAbut(
                               Icons.check_circle,
                               'Етказилган товарлар сони: ',
