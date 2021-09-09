@@ -4,6 +4,7 @@ import 'package:darwin_camera/darwin_camera.dart';
 import 'dart:io' as Io;
 import 'dart:io' as Io;
 import 'package:flutter/material.dart';
+import 'package:flutter_anywhere_menus/flutter_anywhere_menus.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'dart:async';
@@ -44,6 +45,18 @@ class _FinishedPageState extends State<FinishedPage> {
   List<String> evalutionList = [];
   TextEditingController _comment = new TextEditingController(text: '');
   var ev;
+  static const menuItems = <String>[
+    'Расмни кўриш',
+    'Расмни ўчириш',
+  ];
+  final List<PopupMenuItem<String>> _popUpMenuItems = menuItems
+      .map(
+        (String value) => PopupMenuItem<String>(
+          value: value,
+          child: Text(value),
+        ),
+      )
+      .toList();
   @override
   void initState() {
     super.initState();
@@ -168,9 +181,20 @@ class _FinishedPageState extends State<FinishedPage> {
     // var a =
     //     '/storage/emulated/0/Pictures/3c27f462-0fb4-485a-b847-5509d691c0805200698126285788651.jpg';
     if (index != 0) {
-      return Container(
-        child: Image.file(
-          File(listImage[index]['image_path']),
+      return PopupMenuButton(
+        onSelected: (value) {
+          if (value == 'Расмни кўриш') {
+            _selectImage(index);
+          } else {
+            listImage.removeAt(index);
+          }
+          setState(() {});
+        },
+        itemBuilder: (BuildContext context) => _popUpMenuItems,
+        child: Container(
+          child: Image.file(
+            File(listImage[index]['image_path']),
+          ),
         ),
       );
     } else {
@@ -230,10 +254,12 @@ class _FinishedPageState extends State<FinishedPage> {
 
   jsonSendImage() async {
     if (currentLocation != null && listImage.length > 1) {
+      EasyLoading.show(status: LOADER_LOADING);
       var data = await createDataSender();
       // ignore: await_only_futures
       await LocalMemory.dataSave('${widget.product.id}', jsonEncode(data));
       var res = await HttpJson.postJson(HttpConst.finisherd_send_image, data);
+      EasyLoading.dismiss();
       if (!res['error']) {
         EasyLoading.showSuccess(res['data']['message']);
         Navigator.pop(context, '1');
@@ -299,6 +325,9 @@ class _FinishedPageState extends State<FinishedPage> {
                       color: Colors.transparent,
                       child: InkWell(
                         borderRadius: BorderRadius.circular(10),
+                        onLongPress: () {
+                          // index == 0?
+                        },
                         onTap: () {
                           index == 0
                               ? _selectCamerOrGallery()

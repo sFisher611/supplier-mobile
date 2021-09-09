@@ -118,6 +118,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_anywhere_menus:
+    dependency: "direct main"
+    description:
+      name: flutter_anywhere_menus
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.2"
   flutter_easyloading:
     dependency: "direct main"
     description:
