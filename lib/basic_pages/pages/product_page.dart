@@ -10,7 +10,7 @@ import 'package:supplier_project/http/http_json.dart';
 import 'package:supplier_project/model/product.dart';
 import 'package:supplier_project/ui/widgets/container_card_accepted.dart';
 import 'package:supplier_project/ui/widgets/container_card_loading.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'finished_page.dart';
 
 class ProductPage extends StatefulWidget {
@@ -21,7 +21,7 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   // final GlobalKey<LiquidPullToRefreshState> _refreshIndicatorKey =
   //     GlobalKey<LiquidPullToRefreshState>();
-  ScrollController _scrollController;
+
   static int refreshNum = 10; // number that changes when refreshed
   Stream<int> counterStream =
       Stream<int>.periodic(Duration(milliseconds: 0), (x) => refreshNum);
@@ -29,7 +29,6 @@ class _ProductPageState extends State<ProductPage> {
   @override
   void initState() {
     super.initState();
-    _scrollController = new ScrollController();
     // _getProduct();
   }
 
@@ -69,6 +68,50 @@ class _ProductPageState extends State<ProductPage> {
       setState(() {});
     } else {
       EasyLoading.showInfo(res['message']['message']);
+    }
+  }
+
+  Future<void> _selectPhoneAndData(data) async {
+    switch (await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 0);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: const Text('Қўнғироқ қилиш'),
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 1);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: const Text('Бошқа маълумотларни кўриш'),
+                ),
+              ),
+            ],
+          );
+        })) {
+      case 0:
+        _makePhoneCall('tel:${data.phone}');
+        break;
+      case 1:
+        // ...
+        break;
+    }
+  }
+
+  Future<void> _makePhoneCall(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      print('xxxx');
     }
   }
 
@@ -134,6 +177,9 @@ class _ProductPageState extends State<ProductPage> {
                             return ContainerCardLoading(
                               product: snapshot.data[index],
                               size: size,
+                              onLongPress: () {
+                                _selectPhoneAndData(snapshot.data[index]);
+                              },
                               onPressedAccepted: () {
                                 _jsonSetProduct(
                                     snapshot.data[index].id, STATUS_ACCEPTED);

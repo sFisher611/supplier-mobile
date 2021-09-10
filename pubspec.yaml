@@ -38,6 +38,7 @@ dependencies:
   ota_update: ^3.0.2
   permission_handler: ^8.1.4+2
   flutter_anywhere_menus: ^0.1.2
+  url_launcher: ^6.0.10
 
 dev_dependencies:
   flutter_test:
