@@ -100,7 +100,7 @@ class _BasicPageState extends State<BasicPage> {
           tabs: [
             TabData(
               iconData: Icons.airport_shuttle,
-              title: "Йетказмалар",
+              title: "Етказмалар",
             ),
             TabData(
               iconData: Icons.settings,

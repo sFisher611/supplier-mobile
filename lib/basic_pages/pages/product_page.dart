@@ -70,6 +70,11 @@ class _ProductPageState extends State<ProductPage> {
       EasyLoading.showInfo(res['message']['message']);
     }
   }
+  _dataShowDialog()async{
+    // return showDialog(context: context, builder: (BuildContext context) {  
+    //   return  
+    // } );
+  }
 
   Future<void> _selectPhoneAndData(data) async {
     switch (await showDialog(

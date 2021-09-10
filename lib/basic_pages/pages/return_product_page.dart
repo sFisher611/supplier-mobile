@@ -33,7 +33,7 @@ class _ReturnProductPageState extends State<ReturnProductPage> {
 
   _jsonSetProduct(id) async {
     var data = {'id': id};
-    var res = await HttpJson.postJson(HttpConst.productStatusUpdate, data);
+    var res = await HttpJson.postJson(HttpConst.productStatusUpdateReturn, data);
     if (!res['error']) {
       EasyLoading.showSuccess(res['data']['message']);
       setState(() {});
