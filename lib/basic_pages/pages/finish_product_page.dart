@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
+import 'package:supplier_project/basic_pages/pages/image_show_finished.dart';
 import 'package:supplier_project/const/const_status.dart';
 import 'package:supplier_project/const/const_text.dart';
 import 'package:supplier_project/http/http_const.dart';
@@ -83,7 +84,7 @@ class _FinishProductPageState extends State<FinishProductPage> {
                 _date1.toString().substring(0, 10) +
                     ' дан ' +
                     _date2.toString().substring(0, 10),
-                    style: TextStyle(fontSize: 12,color: Colors.grey[400]),
+                style: TextStyle(fontSize: 12, color: Colors.grey[400]),
               ),
             ],
           ),
@@ -144,6 +145,12 @@ class _FinishProductPageState extends State<FinishProductPage> {
                           itemCount: snapshot.data.length,
                           itemBuilder: (BuildContext cxt, int index) {
                             return ContainerCardFinished(
+                              onLongPressed: () {
+                                Navigator.push(context, MaterialPageRoute(
+                                    builder: (BuildContext context) {
+                                  return ImageShowFinished();
+                                }));
+                              },
                               size: size,
                               product: snapshot.data[index],
                             );

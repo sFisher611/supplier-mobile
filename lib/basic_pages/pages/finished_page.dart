@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:darwin_camera/darwin_camera.dart';
 import 'dart:io' as Io;
-import 'dart:io' as Io;
 import 'package:flutter/material.dart';
-import 'package:flutter_anywhere_menus/flutter_anywhere_menus.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_exif_rotation/flutter_exif_rotation.dart';
 import 'dart:async';

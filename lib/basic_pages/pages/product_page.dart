@@ -70,10 +70,36 @@ class _ProductPageState extends State<ProductPage> {
       EasyLoading.showInfo(res['message']['message']);
     }
   }
-  _dataShowDialog()async{
-    // return showDialog(context: context, builder: (BuildContext context) {  
-    //   return  
-    // } );
+
+  _dataShowDialog(data) async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            children: [
+              ListTile(
+                title: Text('ФИО:'),
+                subtitle: Text(data.customer),
+              ),
+              ListTile(
+                title: Text('Юкланган вақти:'),
+                subtitle: Text(data.deliveryTime),
+              ),
+              ListTile(
+                title: Text('Қўшимча манзил:'),
+                subtitle: Text(data.customerAddres),
+              ),
+              ListTile(
+                title: Text('Изох:'),
+                subtitle: Text(data.comment),
+              ),
+              ListTile(
+                title: Text('Код:'),
+                subtitle: Text(data.id.toString()),
+              ),
+            ],
+          );
+        });
   }
 
   Future<void> _selectPhoneAndData(data) async {
@@ -107,7 +133,7 @@ class _ProductPageState extends State<ProductPage> {
         _makePhoneCall('tel:${data.phone}');
         break;
       case 1:
-        // ...
+        _dataShowDialog(data);
         break;
     }
   }
@@ -222,6 +248,9 @@ class _ProductPageState extends State<ProductPage> {
                             return ContainerCardAccepted(
                               product: snapshot.data[index],
                               size: size,
+                              onLongPress: () {
+                                _selectPhoneAndData(snapshot.data[index]);
+                              },
                               onPressedDelivered: () {
                                 WidgetsBinding.instance.addPostFrameCallback(
                                   (_) {
